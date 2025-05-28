@@ -12,7 +12,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the application code to the working directory
 COPY main.py .       # New main application file
-COPY app.py .         # Old Flask app, copied for now, can be removed later
 COPY templates ./templates
 
 # Make port 5000 available to the world outside this container
