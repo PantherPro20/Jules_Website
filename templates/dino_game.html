@@ -6,39 +6,125 @@
     <title>Dino Game</title>
     <link rel="stylesheet" href="/static/dino_game/style.css">
     <style>
-        /* Basic styling to center the game container if needed */
-        body {
+        body { /* Keep existing centering, or adjust */
             display: flex;
-            flex-direction: column; /* Allow for back link */
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            /* justify-content: center; /* Might remove this if boxes take full width */
             min-height: 100vh;
             margin: 0;
-            background-color: #f0f0f0; /* Light grey background for game page */
+            padding-top: 20px; /* Add some space at the top */
+            background-color: #f0f0f0;
         }
-        #game-container {
-            /* Dimensions might be set by the game's CSS or JS, 
-               but we can provide defaults or a border for visibility */
-            width: 600px;  /* Common width for these games */
-            height: 150px; /* Common height */
-            border: 1px dashed #ccc; /* To see the container if game doesn't fill it */
-            position: relative; /* For game elements */
+        #layout-container {
+            display: flex; /* Arrange boxes side-by-side */
+            justify-content: center; /* Center the boxes if they don't fill width */
+            gap: 20px; /* Space between boxes */
+            width: 100%;
+            max-width: 1000px; /* Max width for the two boxes container */
+            margin-bottom: 20px;
         }
-        .back-link {
+        .info-box {
+            border: 1px solid #ccc;
+            padding: 20px;
+            background-color: #fff;
+            width: 45%; /* Each box takes roughly half */
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        #clickable-dino-text {
+            color: #007bff;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        #clickable-dino-text:hover {
+            color: #0056b3;
+        }
+        #actual-game-area {
+            /* display: none; is inline for now */
+            text-align: center; /* To center the game-container if it's narrower */
+        }
+        #game-container { /* This is where the actual game canvas will go */
+            width: 600px;
+            height: 150px;
+            border: 1px solid #999; /* More visible border */
+            margin: 0 auto; /* Center it within actual-game-area */
+            background-color: #fff; /* White background for game area */
+            position: relative;
+        }
+        .back-link { /* Keep existing or adjust */
+            display: block; /* Ensure it's on its own line */
             margin-top: 20px;
             font-size: 1em;
+            text-align: center; /* Center the back link */
         }
     </style>
 </head>
 <body>
-    <div id="game-title">
-        <h1>Dino Run!</h1> <!-- Or some other title -->
+    <div id="layout-container">
+        <div class="info-box" id="box1">
+            <h2 id="clickable-dino-text" style="cursor: pointer;">Chrome Dino</h2>
+            <p>Click the title above to play!</p>
+        </div>
+        <div class="info-box" id="box2">
+            <h2>Game Info</h2>
+            <p>Use spacebar or tap to jump. Avoid obstacles!</p>
+            <!-- Placeholder for other info or leave as is -->
+        </div>
     </div>
-    <div id="game-container">
-        <!-- The game script (script.js) is expected to populate this -->
-    </div>
-    <a href="/" class="back-link">Back to Main Page</a>
 
+    <div id="actual-game-area" style="display: none; margin-top: 20px;">
+        <!-- This div will host the #game-container (or become it) -->
+        <!-- The old #game-container div might be moved here or recreated by JS -->
+        <div id="game-container">
+            <!-- The game script (script.js) is expected to populate this -->
+        </div>
+    </div>
+    
+    <a href="/" class="back-link" style="display: block; margin-top: 20px;">Back to Main Page</a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const clickableDinoText = document.getElementById('clickable-dino-text');
+            const layoutContainer = document.getElementById('layout-container');
+            const actualGameArea = document.getElementById('actual-game-area');
+            const gameContainerForDino = document.getElementById('game-container'); // The div for the actual game
+
+            if (clickableDinoText) {
+                clickableDinoText.addEventListener('click', () => {
+                    if (layoutContainer) layoutContainer.style.display = 'none';
+                    if (actualGameArea) actualGameArea.style.display = 'block';
+
+                    // This part is crucial and depends on the actual dino game script.
+                    // Assuming the external 'script.js' needs to be called or knows to look for 'game-container'.
+                    // If 'script.js' auto-initializes, it might try to run before this click.
+                    // It's better if 'script.js' exposes an init function.
+                    if (typeof window.initDinoGame === 'function') {
+                        window.initDinoGame('game-container'); // Pass the ID of the container
+                    } else if (typeof Game === 'function') { // From previous placeholder
+                        if (gameContainerForDino && !gameContainerForDino.querySelector('canvas')) {
+                             const canvas = document.createElement('canvas');
+                             canvas.id = 'runner-canvas'; 
+                             canvas.width = 600; // Match #game-container CSS
+                             canvas.height = 150; // Match #game-container CSS
+                             gameContainerForDino.innerHTML = ''; 
+                             gameContainerForDino.appendChild(canvas);
+                             try {
+                                new Game(canvas); // Or new Game('#runner-canvas');
+                             } catch (e) { console.error("Error initializing game:", e); }
+                        }
+                    } else {
+                        console.log("Dino game main script loaded, but no specific init function (initDinoGame or Game class) found to start it after click.");
+                        // The game script itself might auto-initialize into a predefined element
+                        // if its <script> tag in HTML is deferred or placed after the element.
+                    }
+                });
+            }
+
+            // The external /static/dino_game/script.js will be loaded after this inline script.
+            // It should ideally not auto-run, but wait for a function call, or look for its container.
+        });
+    </script>
     <script src="/static/dino_game/script.js"></script>
 </body>
 </html>

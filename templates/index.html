@@ -58,10 +58,9 @@
         /* Raindrop styles */
         .raindrop {
             position: absolute;
-            background-color: rgba(174, 194, 224, 0.7); /* Light blue, semi-transparent - same as body or slightly different for effect */
-            /* For medium size, let's use a slightly larger base than before */
-            width: 2px; 
-            height: 20px; /* Increased height for 'medium' feel */
+            background-color: rgba(100, 120, 150, 0.6); /* Darker blue-grey */
+            width: 3px; /* Increased base width */
+            height: 25px; /* Increased base height */
             border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; /* Teardrop shape */
             animation: fall linear infinite;
         }
@@ -205,15 +204,15 @@
             
             drop.style.left = Math.random() * 100 + 'vw'; 
             
-            const fallDuration = Math.random() * 2 + 3; // Duration between 3s and 5s for medium speed
+            const fallDuration = Math.random() * 2.5 + 2.5; // Duration between 2.5s and 5s
             drop.style.animationDuration = fallDuration + 's';
             
-            drop.style.animationDelay = Math.random() * 4 + 's'; // Stagger start times
+            drop.style.animationDelay = Math.random() * 4 + 's'; // Stagger start times (remains same)
 
-            // Slightly vary raindrop dimensions for a more natural look
-            const randomHeight = Math.random() * 10 + 15; // Height between 15px and 25px for 'medium'
+            // Adjust raindrop dimensions for a larger, more realistic feel
+            const randomHeight = Math.random() * 15 + 20; // Height between 20px and 35px
             drop.style.height = randomHeight + 'px';
-            drop.style.width = (randomHeight / 10) + 'px'; // Maintain a reasonable aspect ratio for teardrops (e.g., 10:1 height:width)
+            drop.style.width = (randomHeight / 8) + 'px'; // Making them a bit thicker relative to height
 
             container.appendChild(drop);
 
