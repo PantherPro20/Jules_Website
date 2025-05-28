@@ -38,50 +38,112 @@
     <div class="content-wrapper">
         <h1>World Time</h1>
 
-        <div id="time-info-container">
-            Current time in <span id="timezone-name_display">{{ selected_timezone }}</span>: 
-            <br> <span id="time-display">{{ current_time }}</span>
+        <div>
+            <select id="country-select">
+                <option value="">-- Select Country --</option>
+            </select>
+            <select id="city-timezone-select" disabled>
+                <option value="">-- Select City/Region --</option>
+            </select>
         </div>
 
-        <form method="GET" action="/">
-            <label for="timezone">Select Timezone:</label>
-            <select name="timezone" id="timezone" onchange="this.form.submit()">
-                {% for tz in timezones %}
-                    <option value="{{ tz }}" {% if tz == selected_timezone %}selected{% endif %}>{{ tz }}</option>
-                {% endfor %}
-            </select>
-            <input type="submit" value="Get Time">
-        </form>
+        <div id="time-info-container">
+            Selected Timezone: <span id="timezone-name_display">---</span>
+            <br> <span id="time-display">Please select location</span>
+        </div>
+
     </div>
     <script>
         const timeDisplayElement = document.getElementById('time-display');
         const timezoneNameDisplayElement = document.getElementById('timezone-name_display');
-        const timezoneSelectElement = document.querySelector('select[name="timezone"]');
+        const countrySelectElement = document.getElementById('country-select');
+        const cityTimezoneSelectElement = document.getElementById('city-timezone-select');
+
+        function formatIANATimezoneName(ianaName) {
+            if (!ianaName || typeof ianaName !== 'string') {
+                return '---';
+            }
+            // Split by '/' and take the last part
+            const parts = ianaName.split('/');
+            const cityOrRegion = parts[parts.length - 1];
+            // Replace underscores with spaces
+            return cityOrRegion.replace(/_/g, ' ');
+        }
+
+        async function populateCountries() {
+            try {
+                const response = await fetch('/api/countries');
+                const countries = await response.json();
+                countries.sort((a, b) => a.name.localeCompare(b.name)); // Sort countries by name
+                countries.forEach(country => {
+                    const option = new Option(country.name, country.code);
+                    countrySelectElement.add(option);
+                });
+            } catch (error) {
+                console.error("Could not fetch countries:", error);
+            }
+        }
+
+        countrySelectElement.addEventListener('change', async function() {
+            const selectedCountryCode = this.value;
+            cityTimezoneSelectElement.innerHTML = '<option value="">-- Select City/Region --</option>'; // Clear old options
+            cityTimezoneSelectElement.disabled = true;
+            timeDisplayElement.textContent = 'Please select location';
+            timezoneNameDisplayElement.textContent = '---';
+
+            if (selectedCountryCode) {
+                try {
+                    const response = await fetch(`/api/timezones_for_country/${selectedCountryCode}`);
+                    if (!response.ok) throw new Error(`Error fetching timezones: ${response.statusText}`);
+                    const timezones = await response.json();
+                    if (timezones.length > 0) {
+                        timezones.forEach(tz => {
+                            const friendlyName = formatIANATimezoneName(tz);
+                            const option = new Option(friendlyName, tz); // Display friendlyName, value is full IANA name
+                            cityTimezoneSelectElement.add(option);
+                        });
+                        cityTimezoneSelectElement.disabled = false;
+                        if (timezones.length === 1) { // If only one timezone, auto-select and update time
+                            cityTimezoneSelectElement.value = timezones[0];
+                            updateTime();
+                        }
+                    } else {
+                        cityTimezoneSelectElement.innerHTML = '<option value="">No timezones found</option>';
+                    }
+                } catch (error) {
+                    console.error("Could not fetch timezones for country:", error);
+                    cityTimezoneSelectElement.innerHTML = '<option value="">Error loading timezones</option>';
+                }
+            }
+        });
+
+        cityTimezoneSelectElement.addEventListener('change', updateTime);
 
         async function updateTime() {
-            const selectedTimezone = timezoneSelectElement.value;
+            const selectedIANATimezone = cityTimezoneSelectElement.value;
+
+            if (!selectedIANATimezone) {
+                timeDisplayElement.textContent = 'Please select location';
+                timezoneNameDisplayElement.textContent = '---';
+                return; 
+            }
 
             try {
-                const response = await fetch(`/api/time?timezone=${selectedTimezone}`);
+                const response = await fetch(`/api/time?timezone=${selectedIANATimezone}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
                 timeDisplayElement.textContent = data.current_time;
-                timezoneNameDisplayElement.textContent = data.timezone; // Update the displayed timezone name
+                // data.timezone is the IANA name from the API (e.g., 'America/New_York')
+                timezoneNameDisplayElement.textContent = formatIANATimezoneName(data.timezone);
             } catch (error) {
                 console.error("Could not fetch time:", error);
                 timeDisplayElement.textContent = "Error loading time.";
             }
         }
 
-        // Update time immediately on page load
-        // The form now submits on change, so a separate JS event listener for change is not strictly needed
-        // if the goal is to reload the page with the new timezone.
-        // However, updateTime() is still useful for the initial load and the interval.
-        updateTime();
-
-        // Update time every second
+        document.addEventListener('DOMContentLoaded', populateCountries);
         setInterval(updateTime, 1000);
     </script>
 </body>

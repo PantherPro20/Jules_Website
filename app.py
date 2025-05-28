@@ -14,14 +14,7 @@ def get_current_time(timezone_name):
 
 @app.route('/')
 def index():
-    selected_timezone = 'US/Eastern'
-    if 'timezone' in request.args:
-        selected_timezone = request.args.get('timezone')
-        if selected_timezone not in COMMON_TIMEZONES:
-            selected_timezone = 'US/Eastern' # default to US/Eastern if invalid timezone is provided
-
-    current_time = get_current_time(selected_timezone)
-    return render_template('index.html', current_time=current_time, timezones=COMMON_TIMEZONES, selected_timezone=selected_timezone)
+    return render_template('index.html')
 
 @app.route('/api/time')
 def api_time():
@@ -31,6 +24,19 @@ def api_time():
     
     formatted_time_string = get_current_time(timezone_name)
     return jsonify(current_time=formatted_time_string, timezone=timezone_name)
+
+@app.route('/api/countries')
+def api_countries():
+    countries = [{'code': code, 'name': name} for code, name in pytz.country_names.items()]
+    return jsonify(countries)
+
+@app.route('/api/timezones_for_country/<path:country_code>')
+def api_timezones_for_country(country_code):
+    try:
+        timezones = pytz.country_timezones(country_code)
+        return jsonify(timezones)
+    except KeyError:
+        return jsonify(error="Invalid country code"), 404
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
