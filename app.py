@@ -5,10 +5,8 @@ import pytz
 import os
 import requests
 import time
-from flask_talisman import Talisman
 
 app = Flask(__name__)
-Talisman(app)
 
 NEWSDATA_API_KEY = os.getenv('NEWSDATA_API_KEY')
 NEWS_API_URL = f"https://newsdata.io/api/1/news?apikey={NEWSDATA_API_KEY}&language=en&country=us,gb" # Using f-string for clarity
