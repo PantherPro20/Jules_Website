@@ -52,6 +52,13 @@
             <br> <span id="time-display">Please select location</span>
         </div>
 
+        <div id="headlines-section" style="margin-top: 30px; text-align: left; width: 80%; max-width: 600px;">
+            <h2>Top Headlines</h2>
+            <ul id="headlines-list">
+                <li>Loading headlines...</li>
+            </ul>
+        </div>
+
     </div>
     <script>
         const timeDisplayElement = document.getElementById('time-display');
@@ -145,6 +152,67 @@
 
         document.addEventListener('DOMContentLoaded', populateCountries);
         setInterval(updateTime, 1000);
+
+        async function displayHeadlines() {
+            const headlinesListElement = document.getElementById('headlines-list');
+            const headlinesSectionElement = document.getElementById('headlines-section'); // Get the section for error messages
+
+            try {
+                const response = await fetch('/api/headlines');
+                // No need to check response.ok here if errors are always sent with 200/503 and an error field in JSON
+                const data = await response.json();
+
+                headlinesListElement.innerHTML = ''; // Clear "Loading..." or old headlines
+
+                if (data.error) {
+                    const errorItem = document.createElement('li');
+                    errorItem.textContent = `Error: ${data.error}`;
+                    errorItem.style.color = 'red';
+                    headlinesListElement.appendChild(errorItem);
+                    return;
+                }
+
+                if (data.articles && data.articles.length > 0) {
+                    data.articles.forEach(article => {
+                        const listItem = document.createElement('li');
+                        
+                        const link = document.createElement('a');
+                        link.href = article.link;
+                        link.textContent = article.title;
+                        link.target = '_blank'; // Open in new tab
+                        link.rel = 'noopener noreferrer'; // Security best practice for target="_blank"
+                        
+                        listItem.appendChild(link);
+                        
+                        if (article.source) {
+                            const sourceSpan = document.createElement('span');
+                            sourceSpan.textContent = ` (Source: ${article.source})`;
+                            sourceSpan.style.fontSize = '0.9em';
+                            sourceSpan.style.color = '#555';
+                            listItem.appendChild(sourceSpan);
+                        }
+                        headlinesListElement.appendChild(listItem);
+                    });
+                } else {
+                    const noNewsItem = document.createElement('li');
+                    noNewsItem.textContent = 'No headlines available at the moment.';
+                    headlinesListElement.appendChild(noNewsItem);
+                }
+
+            } catch (error) {
+                console.error("Could not display headlines:", error);
+                headlinesListElement.innerHTML = ''; // Clear
+                const errorItem = document.createElement('li');
+                errorItem.textContent = 'Failed to load headlines. Please check console for details.';
+                errorItem.style.color = 'red';
+                headlinesListElement.appendChild(errorItem);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            populateCountries();
+            displayHeadlines(); // Add this line
+        });
     </script>
 </body>
 </html>
