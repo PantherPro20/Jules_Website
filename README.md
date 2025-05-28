@@ -2,6 +2,8 @@
 
 This is a simple web application built with Python (Flask) that displays the current time in different time zones. Users first select a country from a dropdown menu. A second dropdown is then populated with specific cities or regions within that country. Upon selecting a city/region, the application displays the current time for that location. The displayed time automatically updates every second. Additionally, it now shows top news headlines from around the world, updated periodically.
 
+The application is served using Gunicorn, a production-ready WSGI server, for improved performance and stability. Flask-Talisman is also integrated to automatically set various HTTP security headers, enhancing its resilience against common web vulnerabilities.
+
 ## Running with Docker
 
 ### Prerequisites

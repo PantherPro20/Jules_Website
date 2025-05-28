@@ -1,3 +1,5 @@
 Flask
+Flask-Talisman
+gunicorn
 pytz
 requests
