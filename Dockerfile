@@ -10,16 +10,13 @@ COPY requirements.txt .
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code to the working directory
-COPY app.py .
+# Copy the application code to the working directory
+COPY main.py .       # New main application file
+COPY app.py .         # Old Flask app, copied for now, can be removed later
 COPY templates ./templates
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
 
-# Define environment variable
-ENV FLASK_APP=app.py
-ENV FLASK_RUN_HOST=0.0.0.0
-
-# Run app.py when the container launches
-CMD ["flask", "run"]
+# Run main.py when the container launches
+CMD ["python", "main.py"]
