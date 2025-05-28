@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Time</title>
+</head>
+<body>
+    <h1>World Time</h1>
+    <p>Current time in {{ selected_timezone }}: {{ current_time }}</p>
+    <form method="GET" action="/">
+        <label for="timezone">Select Timezone:</label>
+        <select name="timezone" id="timezone">
+            {% for tz in timezones %}
+                <option value="{{ tz }}" {% if tz == selected_timezone %}selected{% endif %}>{{ tz }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Get Time">
+    </form>
+</body>
+</html>
