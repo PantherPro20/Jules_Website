@@ -14,8 +14,33 @@
             min-height: 100vh;
             margin: 0;
             padding-top: 20px; /* Add some space at the top */
-            background-color: #f0f0f0;
+            background-color: #add8e6; /* ADD THIS */
         }
+
+        /* Raindrop styles */
+        .raindrop {
+            position: absolute;
+            background-color: rgba(100, 120, 150, 0.6); /* Darker blue-grey from recent update */
+            width: 3px; 
+            height: 25px; 
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-25px);
+                opacity: 1;
+            }
+            90% {
+                opacity: 0.9;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+
         #layout-container {
             display: flex; /* Arrange boxes side-by-side */
             justify-content: center; /* Center the boxes if they don't fill width */
@@ -32,25 +57,40 @@
             box-shadow: 0 0 5px rgba(0,0,0,0.1);
             text-align: center;
         }
-        #clickable-dino-text {
+        #box1 { /* Added cursor pointer to the entire box */
+            cursor: pointer;
+        }
+        #clickable-dino-text { /* Removed cursor: pointer; from here, it's on the box now */
             color: #007bff;
             text-decoration: underline;
-            cursor: pointer;
+            /* cursor: pointer; /* Removed */
         }
         #clickable-dino-text:hover {
             color: #0056b3;
         }
         #actual-game-area {
-            /* display: none; is inline for now */
-            text-align: center; /* To center the game-container if it's narrower */
+            /* display: none; is set inline initially */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw; /* Full viewport width */
+            height: 100vh; /* Full viewport height */
+            background-color: #f7f7f7; /* Or white, or as preferred for the game background */
+            z-index: 2000; /* High z-index to cover everything */
+            padding: 0; /* Remove padding if any was there */
+            margin: 0;  /* Remove margin if any was there */
+            display: flex; /* To help center the game-container if it's not 100% */
+            align-items: center;
+            justify-content: center;
         }
-        #game-container { /* This is where the actual game canvas will go */
-            width: 600px;
-            height: 150px;
-            border: 1px solid #999; /* More visible border */
-            margin: 0 auto; /* Center it within actual-game-area */
-            background-color: #fff; /* White background for game area */
+        #game-container {
+            width: 600px;  /* Keep original game width */
+            height: 150px; /* Keep original game height */
+            /* The fixed size will be centered by #actual-game-area's flex properties. */
+            border: 1px solid #999;
+            background-color: #fff; 
             position: relative;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5); /* Add shadow if it's on a different bg */
         }
         .back-link { /* Keep existing or adjust */
             display: block; /* Ensure it's on its own line */
@@ -61,6 +101,7 @@
     </style>
 </head>
 <body>
+    <div id="raindrop-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none;"></div>
     <div id="layout-container">
         <div class="info-box" id="box1">
             <h2 id="clickable-dino-text" style="cursor: pointer;">Chrome Dino</h2>
@@ -85,13 +126,13 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const clickableDinoText = document.getElementById('clickable-dino-text');
+            const clickableBox1 = document.getElementById('box1'); // Changed from clickableDinoText
             const layoutContainer = document.getElementById('layout-container');
             const actualGameArea = document.getElementById('actual-game-area');
             const gameContainerForDino = document.getElementById('game-container'); // The div for the actual game
 
-            if (clickableDinoText) {
-                clickableDinoText.addEventListener('click', () => {
+            if (clickableBox1) { // Changed from clickableDinoText
+                clickableBox1.addEventListener('click', () => { // Changed from clickableDinoText
                     if (layoutContainer) layoutContainer.style.display = 'none';
                     if (actualGameArea) actualGameArea.style.display = 'block';
 
@@ -123,7 +164,44 @@
 
             // The external /static/dino_game/script.js will be loaded after this inline script.
             // It should ideally not auto-run, but wait for a function call, or look for its container.
+            
+            initRain(); // ADD THIS CALL
         });
+
+        function createRaindrop() {
+            const container = document.getElementById('raindrop-container');
+            if (!container) return;
+
+            const drop = document.createElement('div');
+            drop.classList.add('raindrop');
+            
+            drop.style.left = Math.random() * 100 + 'vw'; 
+            
+            const fallDuration = Math.random() * 2.5 + 2.5; // From recent update: 2.5s to 5s
+            drop.style.animationDuration = fallDuration + 's';
+            
+            drop.style.animationDelay = Math.random() * 4 + 's';
+
+            const randomHeight = Math.random() * 15 + 20; // From recent update: 20px to 35px
+            drop.style.height = randomHeight + 'px';
+            drop.style.width = (randomHeight / 8) + 'px'; // From recent update
+
+            container.appendChild(drop);
+
+            setTimeout(() => {
+                if (drop.parentNode === container) { // Check if still child before removing
+                   container.removeChild(drop);
+                }
+            }, (fallDuration + parseFloat(drop.style.animationDelay || 0)) * 1000 + 100);
+        }
+
+        function initRain() {
+            const numberOfDrops = 120; // From recent update
+            for (let i = 0; i < numberOfDrops; i++) {
+                setTimeout(createRaindrop, Math.random() * 3000);
+            }
+            setInterval(createRaindrop, 200); // From recent update
+        }
     </script>
     <script src="/static/dino_game/script.js"></script>
 </body>
