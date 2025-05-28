@@ -43,6 +43,10 @@ def api_timezones_for_country(country_code):
     except KeyError:
         return jsonify(error="Invalid country code"), 404
 
+@app.route('/play_dino_game')
+def play_dino_game():
+    return render_template('dino_game.html')
+
 if __name__ == '__main__':
     # Note: When run with "flask run", it uses host/port from ENV vars or defaults.
     # For direct "python app.py" execution (not used by Docker typically):

@@ -1,0 +1,4 @@
+/* Placeholder for Dino Game styles from KarthikNedunchezhiyan/google-chrome-dino */
+/* Actual styles would be copied from the www/style.css of that repository */
+body { margin: 0; overflow: hidden; background-color: #f7f7f7; } /* Common for games */
+#game-container canvas { display: block; margin: 0 auto; } /* Assuming game runs in a canvas within game-container */

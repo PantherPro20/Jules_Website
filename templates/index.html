@@ -14,10 +14,31 @@
             min-height: 90vh; 
             margin: 0;
             text-align: center; 
+            background-color: #add8e6; /* Added/Updated this line */
         }
         .content-wrapper {
             /* Basic wrapper if needed, can be empty if body handles all */
+            position: relative; /* Added to allow absolute positioning of children if needed, though button is fixed */
         }
+
+        #play-dino-button {
+            position: fixed; 
+            top: 20px;
+            right: 20px;
+            font-size: 1.3em; 
+            text-decoration: none;
+            color: #007bff;
+            background-color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: 1px solid #007bff;
+            z-index: 1001; 
+        }
+        #play-dino-button:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
         #time-info-container {
             margin-top: 20px;
             margin-bottom: 20px;
@@ -33,10 +54,37 @@
             font-size: 1em;
             margin: 5px; /* Added some margin for better spacing */
         }
+
+        /* Raindrop styles */
+        .raindrop {
+            position: absolute;
+            background-color: rgba(174, 194, 224, 0.7); /* Light blue, semi-transparent - same as body or slightly different for effect */
+            /* For medium size, let's use a slightly larger base than before */
+            width: 2px; 
+            height: 20px; /* Increased height for 'medium' feel */
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; /* Teardrop shape */
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-25px); /* Start further above screen */
+                opacity: 1;
+            }
+            90% {
+                opacity: 0.9; /* Start fading a bit earlier */
+            }
+            100% {
+                transform: translateY(100vh); /* Fall to bottom of viewport height */
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
+    <div id="raindrop-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none;"></div>
     <div class="content-wrapper"> 
+        <a href="/play_dino_game" id="play-dino-button">PLAY GAME</a>
         <h1>World Time</h1> 
 
         <div>
@@ -143,8 +191,46 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             populateCountries();
+            initRain(); 
+            // Removed old dino game JS event listeners and related variables
         });
         setInterval(updateTime, 1000);
+
+        function createRaindrop() {
+            const container = document.getElementById('raindrop-container');
+            if (!container) return;
+
+            const drop = document.createElement('div');
+            drop.classList.add('raindrop');
+            
+            drop.style.left = Math.random() * 100 + 'vw'; 
+            
+            const fallDuration = Math.random() * 2 + 3; // Duration between 3s and 5s for medium speed
+            drop.style.animationDuration = fallDuration + 's';
+            
+            drop.style.animationDelay = Math.random() * 4 + 's'; // Stagger start times
+
+            // Slightly vary raindrop dimensions for a more natural look
+            const randomHeight = Math.random() * 10 + 15; // Height between 15px and 25px for 'medium'
+            drop.style.height = randomHeight + 'px';
+            drop.style.width = (randomHeight / 10) + 'px'; // Maintain a reasonable aspect ratio for teardrops (e.g., 10:1 height:width)
+
+            container.appendChild(drop);
+
+            setTimeout(() => {
+                if (drop.parentNode === container) {
+                   container.removeChild(drop);
+                }
+            }, (fallDuration + parseFloat(drop.style.animationDelay || 0)) * 1000 + 100);
+        }
+
+        function initRain() {
+            const numberOfDrops = 120; // Adjust for desired density
+            for (let i = 0; i < numberOfDrops; i++) {
+                setTimeout(createRaindrop, Math.random() * 3000); // Stagger initial creation
+            }
+            setInterval(createRaindrop, 200); // Continuously add new drops (e.g., 5 per second)
+        }
     </script>
 </body>
 </html>

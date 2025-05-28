@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dino Game</title>
+    <link rel="stylesheet" href="/static/dino_game/style.css">
+    <style>
+        /* Basic styling to center the game container if needed */
+        body {
+            display: flex;
+            flex-direction: column; /* Allow for back link */
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0; /* Light grey background for game page */
+        }
+        #game-container {
+            /* Dimensions might be set by the game's CSS or JS, 
+               but we can provide defaults or a border for visibility */
+            width: 600px;  /* Common width for these games */
+            height: 150px; /* Common height */
+            border: 1px dashed #ccc; /* To see the container if game doesn't fill it */
+            position: relative; /* For game elements */
+        }
+        .back-link {
+            margin-top: 20px;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-title">
+        <h1>Dino Run!</h1> <!-- Or some other title -->
+    </div>
+    <div id="game-container">
+        <!-- The game script (script.js) is expected to populate this -->
+    </div>
+    <a href="/" class="back-link">Back to Main Page</a>
+
+    <script src="/static/dino_game/script.js"></script>
+</body>
+</html>
