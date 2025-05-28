@@ -1,6 +1,6 @@
 # World Time Zone Application
 
-This is a simple web application built with Python (Flask) that displays the current time in different time zones. Users can select a time zone from a dropdown menu to see the corresponding time.
+This is a simple web application built with Python (Flask) that displays the current time in different time zones. Users can select a time zone from a dropdown menu to see the corresponding time. The displayed time automatically updates every second.
 
 ## Running with Docker
 
