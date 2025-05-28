@@ -32,6 +32,52 @@
             font-size: 1em;
             margin-top: 10px;
         }
+
+        /* Headline Styles */
+        #headlines-section {
+            margin-top: 30px;
+            text-align: left;
+            width: 80%;
+            max-width: 700px; /* Increased max-width slightly */
+            margin-left: auto;  /* Center the section itself */
+            margin-right: auto; /* Center the section itself */
+        }
+
+        #headlines-list {
+            list-style-type: none; /* Remove default bullets */
+            padding-left: 0;       /* Remove default user-agent padding */
+        }
+
+        #headlines-list li {
+            margin-bottom: 18px; /* Increase space between headline items */
+            padding: 10px;       /* Add some padding around each item for a softer look */
+            border-bottom: 1px solid #eee; /* Subtle separator */
+        }
+
+        #headlines-list li:last-child {
+            border-bottom: none; /* No border for the last item */
+        }
+
+        #headlines-list li a {
+            font-size: 1.2em;    /* Make headline link text bigger */
+            color: #333;         /* Darker color, less like default blue */
+            text-decoration: none; /* Remove underline by default */
+            font-weight: bold;   /* Make titles stand out more */
+        }
+
+        #headlines-list li a:hover,
+        #headlines-list li a:focus { /* Added :focus for accessibility */
+            text-decoration: underline; /* Underline on hover/focus to indicate clickability */
+            color: #007bff; /* Optional: change color on hover, e.g., to a theme blue */
+        }
+
+        #headlines-list li > span { 
+            font-size: 0.85em; /* Slightly smaller */
+            color: #666;     /* Grey color for source */
+            margin-left: 5px; /* Space it from the link if they are siblings - adjusted as it will be on new line */
+            display: block; /* Make it appear on a new line */
+            margin-top: 4px; /* Space from the title if on new line */
+        }
     </style>
 </head>
 <body>
@@ -52,7 +98,7 @@
             <br> <span id="time-display">Please select location</span>
         </div>
 
-        <div id="headlines-section" style="margin-top: 30px; text-align: left; width: 80%; max-width: 600px;">
+        <div id="headlines-section">
             <h2>Top Headlines</h2>
             <ul id="headlines-list">
                 <li>Loading headlines...</li>
