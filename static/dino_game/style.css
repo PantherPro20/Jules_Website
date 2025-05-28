@@ -1,6 +1,0 @@
-/* Placeholder for Dino Game styles */
-#game-canvas { /* Assuming the game uses a canvas with this ID */
-    border: 1px solid #ccc;
-    display: block; /* Or as required by the game */
-    margin: 0 auto; /* Center canvas if it's a block */
-}

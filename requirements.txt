@@ -1,3 +1,2 @@
-CherryPy
-Jinja2
+Flask
 pytz
