@@ -18,6 +18,46 @@
         .content-wrapper {
             /* This class is for grouping if needed, but direct body styling might be enough */
         }
+
+        #play-dino-button {
+            position: fixed; /* Fixed position relative to viewport */
+            top: 20px;
+            right: 20px;
+            font-size: 1.3em; /* Large text */
+            text-decoration: none;
+            color: #007bff;
+            background-color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: 1px solid #007bff;
+            z-index: 1001; /* Ensure it's above other content like raindrops */
+        }
+        #play-dino-button:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        #dino-game-section {
+            /* display: none; /* Initially hidden - handled by inline style on the element */
+            width: 100%;
+            /* max-width: 800px; /* Or adjust as needed */
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff; /* Give it a background to distinguish from page bg */
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center; /* Center the game container if it's block */
+        }
+        #dino-game-container {
+            width: 100%; /* Or specific dimensions like 600px */
+            max-width: 600px; /* Typical width for these games */
+            height: 150px; /* Typical height */
+            margin: 0 auto; /* Center the container if it's smaller than section */
+            border: 1px solid #eee; /* Placeholder border for the game canvas area */
+            position: relative; /* For potential absolute positioning of game elements */
+            background-color: #f7f7f7; /* Light background for the game area */
+        }
+
         #time-info-container {
             margin-top: 20px;
             margin-bottom: 20px;
@@ -78,11 +118,39 @@
             display: block; /* Make it appear on a new line */
             margin-top: 4px; /* Space from the title if on new line */
         }
+
+        /* Raindrop styles */
+        .raindrop {
+            position: absolute;
+            background-color: rgba(174, 194, 224, 0.7); /* Light blue, semi-transparent */
+            width: 2px; /* Medium size - can be adjusted */
+            height: 15px; /* Medium size - elongated shape */
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; /* Teardrop shape */
+            animation: fall linear infinite;
+            /* transform: rotate(35deg); */ /* If we want them slanted, but straight fall is simpler first */
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-20px); /* Start above screen */
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh); /* Fall to bottom of viewport height */
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="content-wrapper">
-        <h1>World Time</h1>
+    <div id="raindrop-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden;"></div>
+    <div class="content-wrapper"> <!-- Existing wrapper -->
+        <a href="#" id="play-dino-button">PLAY GAME</a> {/* Inline styles removed/updated by CSS block */}
+        
+        <h1>World Time</h1> 
 
         <div>
             <select id="country-select">
@@ -98,11 +166,24 @@
             <br> <span id="time-display">Please select location</span>
         </div>
 
-        <div id="headlines-section">
-            <h2>Top Headlines</h2>
-            <ul id="headlines-list">
-                <li>Loading headlines...</li>
-            </ul>
+        <div id="weather-widget-container" style="margin-top: 30px; text-align: center;">
+            <h2>Weather</h2>
+            <a class="weatherwidget-io" href="https://forecast7.com/en/40d71n74d01/new-york/" data-label_1="NEW YORK" data-label_2="WEATHER" data-theme="pure" >NEW YORK WEATHER</a>
+            <script>
+            !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
+            </script>
+            <p style="font-size: 0.8em; color: #777;">Users can typically search for their location within the widget.</p>
+        </div>
+
+        <!-- Headlines section removed -->
+
+        <div id="dino-game-section" style="display: none; margin-top: 30px; padding-top:20px; border-top: 2px solid #ccc;">
+            <h2>Dino Run!</h2>
+            <div id="dino-game-container">
+                <!-- The Dino game (e.g., a canvas) will be loaded here by script.js -->
+                <!-- Or its HTML structure might be defined in its own index.html -->
+            </div>
+            <button id="close-dino-button" style="margin-top:10px;">Close Game</button>
         </div>
 
     </div>
@@ -199,66 +280,109 @@
         document.addEventListener('DOMContentLoaded', populateCountries);
         setInterval(updateTime, 1000);
 
-        async function displayHeadlines() {
-            const headlinesListElement = document.getElementById('headlines-list');
-            const headlinesSectionElement = document.getElementById('headlines-section'); // Get the section for error messages
-
-            try {
-                const response = await fetch('/api/headlines');
-                // No need to check response.ok here if errors are always sent with 200/503 and an error field in JSON
-                const data = await response.json();
-
-                headlinesListElement.innerHTML = ''; // Clear "Loading..." or old headlines
-
-                if (data.error) {
-                    const errorItem = document.createElement('li');
-                    errorItem.textContent = `Error: ${data.error}`;
-                    errorItem.style.color = 'red';
-                    headlinesListElement.appendChild(errorItem);
-                    return;
-                }
-
-                if (data.articles && data.articles.length > 0) {
-                    data.articles.forEach(article => {
-                        const listItem = document.createElement('li');
-                        
-                        const link = document.createElement('a');
-                        link.href = article.link;
-                        link.textContent = article.title;
-                        link.target = '_blank'; // Open in new tab
-                        link.rel = 'noopener noreferrer'; // Security best practice for target="_blank"
-                        
-                        listItem.appendChild(link);
-                        
-                        if (article.source) {
-                            const sourceSpan = document.createElement('span');
-                            sourceSpan.textContent = ` (Source: ${article.source})`;
-                            sourceSpan.style.fontSize = '0.9em';
-                            sourceSpan.style.color = '#555';
-                            listItem.appendChild(sourceSpan);
-                        }
-                        headlinesListElement.appendChild(listItem);
-                    });
-                } else {
-                    const noNewsItem = document.createElement('li');
-                    noNewsItem.textContent = 'No headlines available at the moment.';
-                    headlinesListElement.appendChild(noNewsItem);
-                }
-
-            } catch (error) {
-                console.error("Could not display headlines:", error);
-                headlinesListElement.innerHTML = ''; // Clear
-                const errorItem = document.createElement('li');
-                errorItem.textContent = 'Failed to load headlines. Please check console for details.';
-                errorItem.style.color = 'red';
-                headlinesListElement.appendChild(errorItem);
-            }
-        }
+        // displayHeadlines() function removed
 
         document.addEventListener('DOMContentLoaded', () => {
             populateCountries();
-            displayHeadlines(); // Add this line
+            // displayHeadlines(); // Call removed
+            initRain(); // Initialize raindrops
+
+            const playDinoButton = document.getElementById('play-dino-button');
+            const closeDinoButton = document.getElementById('close-dino-button');
+            const dinoGameSection = document.getElementById('dino-game-section');
+            const dinoGameContainer = document.getElementById('dino-game-container');
+
+            playDinoButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                dinoGameSection.style.display = 'block';
+                
+                // Load the game's CSS
+                const dinoGameStyle = document.createElement('link');
+                dinoGameStyle.rel = 'stylesheet';
+                dinoGameStyle.href = '/static/dino_game/style.css'; // Path to game's CSS
+                document.head.appendChild(dinoGameStyle);
+
+                // Load the game's script
+                if (!document.getElementById('dino-game-logic-script')) {
+                    const dinoGameScript = document.createElement('script');
+                    dinoGameScript.id = 'dino-game-logic-script';
+                    dinoGameScript.src = '/static/dino_game/script.js'; // Path to game's JS
+                    dinoGameScript.onload = function() {
+                        if (typeof window.startGameInContainer === 'function') {
+                            window.startGameInContainer('dino-game-container');
+                        } else if (typeof Game === 'function') { 
+                            if (!dinoGameContainer.querySelector('canvas')) {
+                                const canvas = document.createElement('canvas');
+                                canvas.id = 'runner-canvas'; 
+                                canvas.width = 600;
+                                canvas.height = 150;
+                                dinoGameContainer.innerHTML = ''; 
+                                dinoGameContainer.appendChild(canvas);
+                                new Game(canvas); 
+                            } else {
+                                // If canvas exists, maybe just new Game(existingCanvas);
+                            }
+                        } else {
+                            dinoGameContainer.innerHTML = '<p>Game loaded, but starting mechanism not found. Ensure game script initializes itself or provides a start function.</p>';
+                        }
+                    };
+                    document.body.appendChild(dinoGameScript);
+                }
+                dinoGameSection.scrollIntoView({ behavior: 'smooth' });
+            });
+
+            closeDinoButton.addEventListener('click', function() {
+                dinoGameSection.style.display = 'none';
+                if (typeof window.stopDinoGame === 'function') {
+                    window.stopDinoGame();
+                }
+            });
         });
+
+        function createRaindrop() {
+            const container = document.getElementById('raindrop-container');
+            if (!container) return; // Ensure container exists
+
+            const drop = document.createElement('div');
+            drop.classList.add('raindrop');
+            
+            // Random horizontal position
+            drop.style.left = Math.random() * 100 + 'vw'; 
+            
+            // Random animation duration for varied falling speed
+            // Adjust range for "medium" speed perception. 2s to 5s.
+            const fallDuration = Math.random() * 3 + 2; 
+            drop.style.animationDuration = fallDuration + 's';
+            
+            // Random delay before starting to fall, to stagger them
+            drop.style.animationDelay = Math.random() * 5 + 's';
+
+            // Adjust raindrop size slightly for variation (optional)
+            const randomHeight = Math.random() * 10 + 10; // e.g., 10px to 20px height
+            drop.style.height = randomHeight + 'px';
+            drop.style.width = (randomHeight / 7.5) + 'px'; // Maintain aspect ratio for teardrop
+
+            container.appendChild(drop);
+
+            // Remove drop after it falls to prevent DOM clutter
+            // Animation duration + delay
+            setTimeout(() => {
+                if (drop.parentNode === container) { // Check if still child before removing
+                   container.removeChild(drop);
+                }
+            }, (fallDuration + parseFloat(drop.style.animationDelay || 0)) * 1000 + 100); // Add a small buffer
+        }
+
+        function initRain() {
+            const numberOfDrops = 100; // Adjust for density
+            for (let i = 0; i < numberOfDrops; i++) {
+                // Stagger initial creation slightly as well using a timeout
+                setTimeout(createRaindrop, Math.random() * 2000);
+            }
+            // Periodically add more drops to maintain density as some are removed
+            // This is a simpler way than tracking exact numbers
+            setInterval(createRaindrop, 300); // Add a new drop e.g. every 300ms
+        }
     </script>
 </body>
 </html>
