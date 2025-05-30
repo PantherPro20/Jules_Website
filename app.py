@@ -15,7 +15,7 @@ def get_current_time(timezone_name='UTC'):
     except Exception:
         timezone_name = 'UTC' # Generic fallback
         tz = pytz.timezone(timezone_name)
-    
+
     now = datetime.datetime.now(tz=tz)
     return now.strftime('%H:%M:%S'), timezone_name
 

@@ -9,11 +9,11 @@
             font-family: sans-serif;
             display: flex;
             flex-direction: column;
-            align-items: center; 
-            justify-content: center; 
-            min-height: 90vh; 
+            align-items: center;
+            justify-content: center;
+            min-height: 90vh;
             margin: 0;
-            text-align: center; 
+            text-align: center;
             background-color: #add8e6; /* Added/Updated this line */
         }
         .content-wrapper {
@@ -22,17 +22,17 @@
         }
 
         #play-dino-button {
-            position: fixed; 
+            position: fixed;
             top: 20px;
             right: 20px;
-            font-size: 1.3em; 
+            font-size: 1.3em;
             text-decoration: none;
             color: #007bff;
             background-color: white;
             padding: 8px 15px;
             border-radius: 5px;
             border: 1px solid #007bff;
-            z-index: 1001; 
+            z-index: 1001;
         }
         #play-dino-button:hover {
             background-color: #007bff;
@@ -44,7 +44,7 @@
             margin-bottom: 20px;
         }
         #time-display {
-            font-size: 3em; 
+            font-size: 3em;
             font-weight: bold;
             color: #333;
         }
@@ -82,9 +82,9 @@
 </head>
 <body>
     <div id="raindrop-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none;"></div>
-    <div class="content-wrapper"> 
+    <div class="content-wrapper">
         <a href="/play_dino_game" id="play-dino-button">PLAY GAME</a>
-        <h1>World Time</h1> 
+        <h1>World Time</h1>
 
         <div>
             <select id="country-select">
@@ -171,7 +171,7 @@
             if (!selectedIANATimezone) {
                 timeDisplayElement.textContent = 'Please select location';
                 timezoneNameDisplayElement.textContent = '---';
-                return; 
+                return;
             }
 
             try {
@@ -190,7 +190,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             populateCountries();
-            initRain(); 
+            initRain();
             // Removed old dino game JS event listeners and related variables
         });
         setInterval(updateTime, 1000);
@@ -201,12 +201,12 @@
 
             const drop = document.createElement('div');
             drop.classList.add('raindrop');
-            
-            drop.style.left = Math.random() * 100 + 'vw'; 
-            
+
+            drop.style.left = Math.random() * 100 + 'vw';
+
             const fallDuration = Math.random() * 2.5 + 2.5; // Duration between 2.5s and 5s
             drop.style.animationDuration = fallDuration + 's';
-            
+
             drop.style.animationDelay = Math.random() * 4 + 's'; // Stagger start times (remains same)
 
             // Adjust raindrop dimensions for a larger, more realistic feel

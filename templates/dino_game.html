@@ -21,8 +21,8 @@
         .raindrop {
             position: absolute;
             background-color: rgba(100, 120, 150, 0.6); /* Darker blue-grey from recent update */
-            width: 3px; 
-            height: 25px; 
+            width: 3px;
+            height: 25px;
             border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
             animation: fall linear infinite;
         }
@@ -88,9 +88,17 @@
             height: 150px; /* Keep original game height */
             /* The fixed size will be centered by #actual-game-area's flex properties. */
             border: 1px solid #999;
-            background-color: #fff; 
+            background-color: #fff;
             position: relative;
             box-shadow: 0 0 10px rgba(0,0,0,0.5); /* Add shadow if it's on a different bg */
+        }
+        #game-container canvas#board {
+            display: block; /* Good default for canvas */
+            width: 100%;    /* Make canvas fill the container */
+            height: 100%;   /* Make canvas fill the container */
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
         }
         .back-link { /* Keep existing or adjust */
             display: block; /* Ensure it's on its own line */
@@ -116,56 +124,32 @@
 
     <div id="actual-game-area" style="display: none; margin-top: 20px;">
         <!-- This div will host the #game-container (or become it) -->
-        <!-- The old #game-container div might be moved here or recreated by JS -->
         <div id="game-container">
-            <!-- The game script (script.js) is expected to populate this -->
+            <canvas id="board"></canvas>
         </div>
     </div>
-    
+
     <a href="/" class="back-link" style="display: block; margin-top: 20px;">Back to Main Page</a>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const clickableBox1 = document.getElementById('box1'); // Changed from clickableDinoText
+            const clickableBox1 = document.getElementById('box1');
             const layoutContainer = document.getElementById('layout-container');
             const actualGameArea = document.getElementById('actual-game-area');
-            const gameContainerForDino = document.getElementById('game-container'); // The div for the actual game
+            // const gameContainerForDino = document.getElementById('game-container'); // Not strictly needed if game auto-initializes
 
-            if (clickableBox1) { // Changed from clickableDinoText
-                clickableBox1.addEventListener('click', () => { // Changed from clickableDinoText
+            if (clickableBox1) {
+                clickableBox1.addEventListener('click', () => {
                     if (layoutContainer) layoutContainer.style.display = 'none';
                     if (actualGameArea) actualGameArea.style.display = 'block';
 
-                    // This part is crucial and depends on the actual dino game script.
-                    // Assuming the external 'script.js' needs to be called or knows to look for 'game-container'.
-                    // If 'script.js' auto-initializes, it might try to run before this click.
-                    // It's better if 'script.js' exposes an init function.
-                    if (typeof window.initDinoGame === 'function') {
-                        window.initDinoGame('game-container'); // Pass the ID of the container
-                    } else if (typeof Game === 'function') { // From previous placeholder
-                        if (gameContainerForDino && !gameContainerForDino.querySelector('canvas')) {
-                             const canvas = document.createElement('canvas');
-                             canvas.id = 'runner-canvas'; 
-                             canvas.width = 600; // Match #game-container CSS
-                             canvas.height = 150; // Match #game-container CSS
-                             gameContainerForDino.innerHTML = ''; 
-                             gameContainerForDino.appendChild(canvas);
-                             try {
-                                new Game(canvas); // Or new Game('#runner-canvas');
-                             } catch (e) { console.error("Error initializing game:", e); }
-                        }
-                    } else {
-                        console.log("Dino game main script loaded, but no specific init function (initDinoGame or Game class) found to start it after click.");
-                        // The game script itself might auto-initialize into a predefined element
-                        // if its <script> tag in HTML is deferred or placed after the element.
-                    }
+                    // The game's output.js should find the canvas with id="board"
+                    // and initialize itself when actualGameArea becomes visible.
+                    // No explicit game start call from here is needed if output.js handles it.
                 });
             }
 
-            // The external /static/dino_game/script.js will be loaded after this inline script.
-            // It should ideally not auto-run, but wait for a function call, or look for its container.
-            
-            initRain(); // ADD THIS CALL
+            initRain();
         });
 
         function createRaindrop() {
@@ -174,12 +158,12 @@
 
             const drop = document.createElement('div');
             drop.classList.add('raindrop');
-            
-            drop.style.left = Math.random() * 100 + 'vw'; 
-            
+
+            drop.style.left = Math.random() * 100 + 'vw';
+
             const fallDuration = Math.random() * 2.5 + 2.5; // From recent update: 2.5s to 5s
             drop.style.animationDuration = fallDuration + 's';
-            
+
             drop.style.animationDelay = Math.random() * 4 + 's';
 
             const randomHeight = Math.random() * 15 + 20; // From recent update: 20px to 35px
@@ -203,6 +187,6 @@
             setInterval(createRaindrop, 200); // From recent update
         }
     </script>
-    <script src="/static/dino_game/script.js"></script>
+    <script src="/static/dino_game/output.js"></script>
 </body>
 </html>

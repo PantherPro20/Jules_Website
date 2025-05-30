@@ -1,11 +1,27 @@
-@font-face {
-    font-family: 'Arcade';
-    src: url('./assets/arcade_font.woff2');
+/* Placeholder for Dino Game styles from KarthikNedunchezhiyan/google-chrome-dino */
+/* Actual styles would be copied from the www/style.css of that repository */
+
+body { /* Styles for the game page itself, if not overridden by dino_game.html styles */
+    margin: 0;
+    overflow: hidden; /* Typically games hide body overflow */
+    background-color: #f7f7f7; /* Match game area background for consistency */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
 }
 
-#container {
-    position: absolute;
-    top: 10%;
-    left: 50%;
-    transform: translate(-50%, -10%);
+/* #game-container is defined in dino_game.html with specific dimensions */
+/* This CSS assumes the game's script.js will create/use a <canvas> element */
+/* possibly inside #game-container. */
+
+#game-container canvas {
+    display: block; /* Remove extra space below canvas */
+    /* width and height for canvas should ideally be set via JS by the game,
+       or directly on the canvas element if the game expects a pre-sized one.
+       If game sets canvas to 100% of container, it will take container's size.
+       For now, no explicit width/height here to let game script control it. */
+    image-rendering: pixelated; /* Common for pixel art games */
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
 }
